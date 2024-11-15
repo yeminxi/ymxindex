@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名字抽签器</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            background-image: url('background.svg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #333;
+            text-align: center;
+        }
+
+       .container {
+            text-align: center;
+            width: 300px;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #nameInput {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        #nameInput::-webkit-input-placeholder {
+            color: #666;
+        }
+
+        #nameInput:-moz-placeholder {
+            color: #666;
+        }
+
+        #nameInput::-moz-placeholder {
+            color: #666;
+        }
+
+        #nameInput:-ms-input-placeholder {
+            color: #666;
+        }
+
+        #nameInput:focus {
+            border-color: #FF5733;
+        }
+
+        #nameInput:invalid {
+            border-color: #E64A2D;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF5733;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #E64A2D;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+       .footer {
+            position: fixed;
+            right: 10px;
+            bottom: 20px;
+            background-color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+        }
+
+       .result-list {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+       .result-list li {
+            margin-bottom: 5px;
+            background-color: #e6e6e6;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+       .probability-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+       .reset-button {
+            position: fixed;
+            right: 10px;
+            bottom: 60px; /* 调整位置使其在页脚上方合适位置 */
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+       
+        .ymx {
+            position: fixed;
+            right: 10px;
+            bottom: 120px; /* 调整位置使其在页脚上方合适位置 */
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+       .ymx:hover {
+            background-color: #b3b3b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>名字抽签器</h1>
+        <textarea id="nameInput" placeholder="每行输入一个名字"></textarea>
+        <button onclick="shuffleAndPick()">开始抽签</button>
+        <ul class="result-list"></ul>
+        <div class="probability-info">
+            输入名字总数：<span id="totalNamesCount">0</span>个，5次内抽中一次的概率：<span id="probabilityValue">0%</span>
+        </div>
+    </div>
+    <a href="https://ymx.us.kg/" title="叶泯希主页" target="_blank">
+        <button class="ymx">叶泯希</button>
+    </a>
+    <button class="reset-button" onclick="resetInput()">回到最初</button>
+    <div class="footer">
+        Design by 叶泯希
+    </div>
+    <script>
+        const pickedNames = [];
+
+        function fisherYatesShuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAndPick() {
+            const inputNames = document.getElementById('nameInput').value.split('\n').map(name => name.trim()).filter(name => name!== '');
+            const totalNamesCount = inputNames.length;
+            document.getElementById('totalNamesCount').textContent = totalNamesCount;
+
+            if (totalNamesCount === 0) {
+                alert('请输入至少一个名字');
+                return;
+            }
+
+            let probability = 0;
+            if (totalNamesCount > 0) {
+                probability = (1 - Math.pow((totalNamesCount - 1) / totalNamesCount, 5)) * 100;
+                probability = probability.toFixed(2); // 保留两位小数
+            }
+            document.getElementById('probabilityValue').textContent = probability + '%';
+
+            let result;
+            do {
+                const shuffledNames = fisherYatesShuffle(inputNames);
+                result = shuffledNames[Math.floor(Math.random() * shuffledNames.length)];
+            } while (pickedNames.includes(result) && pickedNames.length >= 5);
+
+            pickedNames.unshift(result);
+            if (pickedNames.length > 5) {
+                pickedNames.pop();
+            }
+
+            const resultList = document.querySelector('.result-list');
+            resultList.innerHTML = '';
+            pickedNames.forEach(name => {
+                const listItem = document.createElement('li');
+                listItem.textContent = name;
+                resultList.appendChild(listItem);
+            });
+
+            document.body.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" font-family="Arial" font-size="32" text-anchor="middle" fill="white"><text x="50" y="50">${encodeURIComponent(result)}</text></svg>')`;
+        }
+
+        function resetInput() {
+            document.getElementById('nameInput').value = '';
+            document.getElementById('totalNamesCount').textContent = 0;
+            document.getElementById('probabilityValue').textContent = '0%';
+            pickedNames.length = 0; // 清空已抽中名字列表
+            const resultList = document.querySelector('.result-list');
+            resultList.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
