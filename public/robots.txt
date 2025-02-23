@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Allow: /nhd/
+Allow: /cj/
 Disallow: /static/
-Sitemap: https://ymx.us.kg/sitemap.xml
+Sitemap: https://418121.xyz/sitemap.xml
