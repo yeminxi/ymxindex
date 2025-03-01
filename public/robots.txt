@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Allow: /nhd/
 Allow: /cj/
+Allow: /sitemap.xml
 Disallow: /static/
 Sitemap: https://418121.xyz/sitemap.xml
